@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,12 @@ import {
   Play,
   AlertTriangle,
   CheckCircle2,
+  BookOpen,
+  LayoutDashboard,
+  Home as HomeIcon,
+  MessageSquare,
+  ChevronRight,
+  Zap,
 } from "lucide-react";
 
 interface Message {
@@ -35,7 +42,9 @@ interface Message {
   timestamp: string;
 }
 
-export default function EcoSimDashboard() {
+export default function EcoSimApp() {
+  const [activeTab, setActiveTab] = useState<"dashboard" | "materi" | "webcomic" | "home">("dashboard");
+
   // Economic State
   const [inflation, setInflation] = useState<number>(12.0);
   const [gdpGrowth, setGdpGrowth] = useState<number>(5.0);
@@ -51,7 +60,7 @@ export default function EcoSimDashboard() {
     {
       id: "1",
       sender: "ai",
-      text: "Halo Menteri! Inflasi kita sedang gawat. Apa yang harus kita lakukan dengan suku bunga?",
+      text: "Halo Menteri! Inflasi kita sedang gawat di angka 12.0%. Apa rencana tindakan Anda terhadap suku bunga dan pajak?",
       timestamp: "Just now",
     },
   ]);
@@ -66,7 +75,6 @@ export default function EcoSimDashboard() {
   const handleApplyPolicy = () => {
     setIsSimulating(true);
     setTimeout(() => {
-      // Economic logic simulation mock
       let newInflation = 12.0 - (interestRate - 5.0) * 0.8 - (taxRate - 10.0) * 0.3;
       let newGdp = 5.0 - (interestRate - 5.0) * 0.4 - (taxRate - 10.0) * 0.2;
 
@@ -76,16 +84,15 @@ export default function EcoSimDashboard() {
       setInflation(newInflation);
       setGdpGrowth(newGdp);
       setIsSimulating(false);
-      setLastAction(`Kebijakan Diterapkan: Suku Bunga ${interestRate}% & Pajak ${taxRate}%`);
+      setLastAction(`Simulasi Berhasil: Suku Bunga ${interestRate}% & Pajak ${taxRate}%`);
 
-      // AI Mentor automatic comment on policy change
       let mentorResponse = "";
       if (interestRate >= 10) {
-        mentorResponse = `Keputusan tegas, Pak Menteri! Menaikkan suku bunga ke ${interestRate}% akan meredam laju inflasi. Namun perhatikan efek sampingnya pada pinjaman usaha.`;
+        mentorResponse = `Langkah berani, Pak Menteri! Suku bunga tinggi (${interestRate}%) akan menekan laju inflasi menjadi ${newInflation}%. Namun perhatikan pertumbuhan ekonomi (${newGdp}%).`;
       } else if (interestRate <= 4) {
-        mentorResponse = `Suku bunga rendah (${interestRate}%) akan memicu kredit usaha, tetapi berisiko mendorong inflasi semakin tinggi!`;
+        mentorResponse = `Suku bunga rendah (${interestRate}%) memicu pertumbuhan (${newGdp}%), tapi inflasimelonjak ke ${newInflation}%! Hati-hati!`;
       } else {
-        mentorResponse = `Kebijakan suku bunga (${interestRate}%) dan pajak (${taxRate}%) telah diperbarui. Mari kita pantau respon pasar dalam 1 kuartal ke depan.`;
+        mentorResponse = `Kebijakan suku bunga (${interestRate}%) dan pajak (${taxRate}%) diperbarui. Inflasi kini ${newInflation}% dengan pertumbuhan GDP ${newGdp}%.`;
       }
 
       setMessages((prev) => [
@@ -94,42 +101,33 @@ export default function EcoSimDashboard() {
           id: Date.now().toString(),
           sender: "ai",
           text: mentorResponse,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
     }, 600);
   };
 
-  const handleSendMessage = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!inputMessage.trim()) return;
 
-    const userMsgText = inputMessage.trim();
-    const userMsgObj: Message = {
+    const userMsg: Message = {
       id: Date.now().toString(),
       sender: "user",
-      text: userMsgText,
+      text: inputMessage,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    setMessages((prev) => [...prev, userMsgObj]);
+    setMessages((prev) => [...prev, userMsg]);
+    const currentInput = inputMessage;
     setInputMessage("");
 
-    // Generate intelligent AI mentor response
     setTimeout(() => {
-      let aiText = "";
-      const lower = userMsgText.toLowerCase();
-
-      if (lower.includes("suku bunga") || lower.includes("bunga")) {
-        aiText = `Untuk meredam inflasi ${inflation}%, menaikkan suku bunga bank sentral (saat ini ${interestRate}%) adalah langkah klasik. Setiap kenaikan 1% dapat menekan inflasi sekitar 0.8%.`;
-      } else if (lower.includes("pajak") || lower.includes("tax")) {
-        aiText = `Tingkat pajak saat ini di ${taxRate}%. Penyesuaian pajak langsung mempengaruhi daya beli masyarakat dan pendapatan belanja negara.`;
-      } else if (lower.includes("inflasi")) {
-        aiText = `Inflasi kita berada di angka ${inflation}%. Target aman biasanya 2% - 4%. Kita perlu mengombinasikan ketatnya moneter dan efisiensi fiskal!`;
-      } else if (lower.includes("pdb") || lower.includes("pertumbuhan")) {
-        aiText = `Pertumbuhan PDB saat ini ${gdpGrowth}%. Jika kita menaikkan suku bunga terlalu tinggi, pertumbuhan bisnis bisa terkoreksi turun.`;
-      } else {
-        aiText = `Saran saya Pak Menteri: Fokus utama kita saat ini adalah menurunkan inflasi (${inflation}%) tanpa membuat pertumbuhan PDB (${gdpGrowth}%) anjlok ke zona negatif. Ada instruksi khusus?`;
+      let aiText = `Analisis kebijakan: '${currentInput}'. Untuk mengendalikan inflasi, kita bisa menaikkan suku bunga acuan. Mari atur slider di panel kebijakan!`;
+      if (currentInput.toLowerCase().includes("inflasi")) {
+        aiText = "Inflasi terjadi saat jumlah uang beredar terlalu banyak dibanding ketersediaan barang. Gunakan suku bunga tinggi untuk mengerem laju kredit!";
+      } else if (currentInput.toLowerCase().includes("pajak") || currentInput.toLowerCase().includes("tax")) {
+        aiText = "Kebijakan fiskal melalui penyesuaian pajak berpengaruh langsung pada daya beli masyarakat dan pendapatan negara.";
       }
 
       setMessages((prev) => [
@@ -145,317 +143,481 @@ export default function EcoSimDashboard() {
   };
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-100 font-sans overflow-hidden">
-      {/* ================= PANEL KIRI: DASHBOARD MENTERI (70%) ================= */}
-      <div className="flex-1 w-[70%] flex flex-col h-full border-r border-slate-800/80 overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 lg:p-8 space-y-8">
-        
-        {/* HEADER DASHBOARD */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
-          <div>
-            <div className="flex items-center gap-2">
-              <Badge variant="default" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-3 py-1">
-                <Landmark className="w-3.5 h-3.5 mr-1" /> Kabinet Ekonomi
-              </Badge>
-              <span className="text-xs text-slate-500 font-mono">ECOSIM-v1.0</span>
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white mt-1">
-              Pusat Kendali Makroekonomi
-            </h1>
-            <p className="text-sm text-slate-400 mt-0.5">
-              Kelola instrumen moneter dan fiskal negara untuk menjaga stabilitas pasar.
-            </p>
-          </div>
-          
+    <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b] font-serif flex flex-col selection:bg-[#fae500]">
+      {/* Top Banner / Navbar - Webcomic Modern Brutalism Style */}
+      <header className="border-b-4 border-[#1c1b1b] bg-[#094cb2] text-white sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setInflation(12.0);
-                setGdpGrowth(5.0);
-                setInterestRate(7.5);
-                setTaxRate(15.0);
-                setLastAction(null);
-              }}
-              className="text-xs border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white"
-            >
-              <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset Indikator
-            </Button>
-            <Button
-              onClick={handleApplyPolicy}
-              disabled={isSimulating}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs sm:text-sm px-4 shadow-lg shadow-blue-600/25"
-            >
-              {isSimulating ? (
-                <>
-                  <Activity className="w-4 h-4 mr-1 animate-spin" /> Menganalisis...
-                </>
-              ) : (
-                <>
-                  <Play className="w-4 h-4 mr-1 fill-current" /> Simulasi Kuartal
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* STATUS KARTU INDIKATOR UTAMA (TOP CARDS) */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-blue-400" /> Indikator Status Negara
-            </h2>
-            <span className="text-xs text-slate-500">Pembaruan Real-time</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* KARTU 1: TINGKAT INFLASI */}
-            <Card className="relative overflow-hidden border-slate-800/80 bg-slate-900/60 backdrop-blur-md hover:border-red-500/40 transition-all duration-300 group">
-              <div className="absolute top-0 left-0 w-1 h-full bg-red-500" />
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-slate-300">
-                  Tingkat Inflasi
-                </CardTitle>
-                <div className="p-2 rounded-lg bg-red-500/10 text-red-400 group-hover:scale-110 transition-transform">
-                  <ShieldAlert className="w-5 h-5" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-baseline justify-between">
-                  {/* TEKS WARNA MERAH */}
-                  <span className="text-4xl font-extrabold tracking-tight text-red-500 drop-shadow-sm">
-                    {inflation.toFixed(1)}%
-                  </span>
-                  <Badge variant="destructive" className="flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" /> Waspada Tinggi
-                  </Badge>
-                </div>
-                <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 inline shrink-0" />
-                  Target aman nasional berada di bawah 4.0%
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* KARTU 2: PERTUMBUHAN PDB */}
-            <Card className="relative overflow-hidden border-slate-800/80 bg-slate-900/60 backdrop-blur-md hover:border-emerald-500/40 transition-all duration-300 group">
-              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-slate-300">
-                  Pertumbuhan PDB
-                </CardTitle>
-                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-baseline justify-between">
-                  {/* TEKS WARNA HIJAU */}
-                  <span className="text-4xl font-extrabold tracking-tight text-emerald-400 drop-shadow-sm">
-                    {gdpGrowth > 0 ? `+${gdpGrowth.toFixed(1)}%` : `${gdpGrowth.toFixed(1)}%`}
-                  </span>
-                  <Badge variant="success" className="flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Ekspansif
-                  </Badge>
-                </div>
-                <p className="text-xs text-slate-400 mt-2">
-                  Pertumbuhan sektor riil dan konsumsi rumah tangga tetap stabil.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* AREA KEBIJAKAN NEGARA (SLIDERS) */}
-        <div className="space-y-4 pt-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-blue-400" /> Kebijakan Negara
-            </h2>
-            {lastAction && (
-              <span className="text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-0.5">
-                {lastAction}
-              </span>
-            )}
-          </div>
-
-          <Card className="border-slate-800/80 bg-slate-900/60 backdrop-blur-md p-6 space-y-8">
-            {/* SLIDER 1: SUKU BUNGA BANK SENTRAL */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-md bg-blue-500/10 text-blue-400">
-                    <Landmark className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-200 block">
-                      Suku Bunga Bank Sentral
-                    </label>
-                    <span className="text-xs text-slate-400">
-                      Instrumen Moneter (Mengendalikan laju kredit & inflasi)
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg">
-                  <span className="text-lg font-bold text-blue-400 font-mono">
-                    {interestRate.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-
-              <Slider
-                value={[interestRate]}
-                min={0.0}
-                max={20.0}
-                step={0.5}
-                onValueChange={(val) => setInterestRate(val[0])}
-                className="w-full cursor-pointer"
-              />
-
-              <div className="flex justify-between text-xs text-slate-500 font-mono">
-                <span>0% (Stimulus Ekstrem)</span>
-                <span>10% (Netral)</span>
-                <span>20% (Ketat Maksimal)</span>
-              </div>
-            </div>
-
-            <div className="border-t border-slate-800/80 pt-6 space-y-3">
-              {/* SLIDER 2: TINGKAT PAJAK */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-md bg-cyan-500/10 text-cyan-400">
-                    <Percent className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-semibold text-slate-200 block">
-                      Tingkat Pajak
-                    </label>
-                    <span className="text-xs text-slate-400">
-                      Instrumen Fiskal (Pendapatan kas negara & penerimaan)
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg">
-                  <span className="text-lg font-bold text-cyan-400 font-mono">
-                    {taxRate.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-
-              <Slider
-                value={[taxRate]}
-                min={0.0}
-                max={50.0}
-                step={1.0}
-                onValueChange={(val) => setTaxRate(val[0])}
-                className="w-full cursor-pointer"
-              />
-
-              <div className="flex justify-between text-xs text-slate-500 font-mono">
-                <span>0% (Surga Pajak)</span>
-                <span>25% (Standar)</span>
-                <span>50% (Pajak Tinggi)</span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <Button
-                onClick={handleApplyPolicy}
-                disabled={isSimulating}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-md shadow-blue-500/20"
-              >
-                Terapkan Perubahan Kebijakan
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-
-      {/* ================= PANEL KANAN: AI MENTOR CHAT PANEL (30%) ================= */}
-      <div className="w-[30%] min-w-[320px] max-w-[420px] flex flex-col h-full bg-slate-900/90 border-l border-slate-800">
-        
-        {/* HEADER AI MENTOR */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80 backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-base shadow-md shadow-blue-500/20">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+            <div className="bg-[#fae500] text-[#1c1b1b] p-2 border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]">
+              <Zap className="w-6 h-6 fill-[#1c1b1b]" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-slate-100 text-sm">Budi - Staf Ahli Ekonomi</h3>
-              </div>
-              <p className="text-xs text-slate-400">Penasihat Senior Makroekonomi</p>
+              <h1 className="font-heading text-2xl font-black uppercase tracking-tight flex items-center gap-2">
+                EASYNOMICS
+                <span className="bg-[#fe6b00] text-xs font-label px-2 py-0.5 border border-[#1c1b1b] text-white shadow-[1px_1px_0px_0px_#1c1b1b]">
+                  WEBCOMIC PLATFORM
+                </span>
+              </h1>
+              <p className="font-label text-xs text-[#d9e2ff] font-medium hidden sm:block">
+                Interaktif, Visual & Real-Time Macroeconomic Simulator
+              </p>
             </div>
           </div>
-          <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-        </div>
 
-        {/* RIWAYAT CHAT (MIDDLE AREA) */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950/40">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex flex-col ${
-                msg.sender === "user" ? "items-end" : "items-start"
+          {/* Navigation Tabs */}
+          <nav className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`px-3 py-1.5 font-label font-bold text-xs uppercase border-2 border-[#1c1b1b] transition-all flex items-center gap-1.5 ${
+                activeTab === "dashboard"
+                  ? "bg-[#fae500] text-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]"
+                  : "bg-white text-[#1c1b1b] hover:bg-[#f0eded]"
               }`}
             >
-              <div className="flex items-center gap-1.5 mb-1 px-1">
-                {msg.sender === "ai" ? (
-                  <>
-                    <Bot className="w-3.5 h-3.5 text-blue-400" />
-                    <span className="text-[11px] font-semibold text-slate-400">Budi</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-[11px] font-semibold text-slate-400">Menteri</span>
-                    <User className="w-3.5 h-3.5 text-slate-300" />
-                  </>
-                )}
-                <span className="text-[10px] text-slate-600 ml-1">{msg.timestamp}</span>
+              <LayoutDashboard className="w-4 h-4" />
+              <span className="hidden md:inline">Dashboard</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("materi")}
+              className={`px-3 py-1.5 font-label font-bold text-xs uppercase border-2 border-[#1c1b1b] transition-all flex items-center gap-1.5 ${
+                activeTab === "materi"
+                  ? "bg-[#fae500] text-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]"
+                  : "bg-white text-[#1c1b1b] hover:bg-[#f0eded]"
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden md:inline">Daftar Materi</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("webcomic")}
+              className={`px-3 py-1.5 font-label font-bold text-xs uppercase border-2 border-[#1c1b1b] transition-all flex items-center gap-1.5 ${
+                activeTab === "webcomic"
+                  ? "bg-[#fae500] text-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]"
+                  : "bg-white text-[#1c1b1b] hover:bg-[#f0eded]"
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden md:inline">Komik 1.1</span>
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-6">
+        {/* TAB 1: DASHBOARD SIMULATOR */}
+        {activeTab === "dashboard" && (
+          <div className="space-y-6">
+            {/* Top Indicator Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#f0eded] border-b-2 border-[#1c1b1b] pb-2">
+                  <CardDescription className="flex items-center justify-between font-label font-bold text-xs uppercase text-[#1c1b1b]">
+                    Tingkat Inflasi
+                    <AlertTriangle className="w-4 h-4 text-[#ba1a1a]" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="font-heading text-3xl font-black text-[#ba1a1a]">
+                    {inflation}%
+                  </div>
+                  <p className="font-label text-xs mt-1 text-[#434653]">
+                    Target Nasional: 2.0% - 4.0%
+                  </p>
+                  <div className="mt-2">
+                    <Badge variant={inflation > 8 ? "destructive" : "success"}>
+                      {inflation > 8 ? "Waspada Tinggi" : "Stabil"}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#f0eded] border-b-2 border-[#1c1b1b] pb-2">
+                  <CardDescription className="flex items-center justify-between font-label font-bold text-xs uppercase text-[#1c1b1b]">
+                    Pertumbuhan GDP
+                    <TrendingUp className="w-4 h-4 text-[#094cb2]" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="font-heading text-3xl font-black text-[#094cb2]">
+                    {gdpGrowth}%
+                  </div>
+                  <p className="font-label text-xs mt-1 text-[#434653]">
+                    Proyeksi Tahunan Kuartal III
+                  </p>
+                  <div className="mt-2">
+                    <Badge variant="default">Ekspansi Ekonomis</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#f0eded] border-b-2 border-[#1c1b1b] pb-2">
+                  <CardDescription className="flex items-center justify-between font-label font-bold text-xs uppercase text-[#1c1b1b]">
+                    Suku Bunga Acuan
+                    <Landmark className="w-4 h-4 text-[#fe6b00]" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="font-heading text-3xl font-black text-[#fe6b00]">
+                    {interestRate}%
+                  </div>
+                  <p className="font-label text-xs mt-1 text-[#434653]">
+                    Instrumen Kebijakan Moneter
+                  </p>
+                  <div className="mt-2">
+                    <Badge variant="secondary">Moneter Kebijakan</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#f0eded] border-b-2 border-[#1c1b1b] pb-2">
+                  <CardDescription className="flex items-center justify-between font-label font-bold text-xs uppercase text-[#1c1b1b]">
+                    Pajak Penghasilan (PPh)
+                    <Percent className="w-4 h-4 text-[#695f00]" />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="font-heading text-3xl font-black text-[#1c1b1b]">
+                    {taxRate}%
+                  </div>
+                  <p className="font-label text-xs mt-1 text-[#434653]">
+                    Instrumen Kebijakan Fiskal
+                  </p>
+                  <div className="mt-2">
+                    <Badge variant="accent">Fiskal Negara</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Main Interactive Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Policy Controls Panel (7 Cols) */}
+              <div className="lg:col-span-7 space-y-6">
+                <Card className="border-3 border-[#1c1b1b] shadow-[6px_6px_0px_0px_#1c1b1b] bg-white">
+                  <CardHeader className="bg-[#094cb2] text-white border-b-3 border-[#1c1b1b]">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Sliders className="w-5 h-5" />
+                        Ruang Kendali Kebijakan Menteri
+                      </CardTitle>
+                      <span className="bg-[#fae500] text-[#1c1b1b] font-label text-xs font-bold px-2 py-0.5 border border-[#1c1b1b]">
+                        Simulasi Makro
+                      </span>
+                    </div>
+                    <CardDescription className="text-[#d9e2ff]">
+                      Atur instrumen suku bunga moneter dan tarif pajak fiskal untuk menyeimbangkan inflasi & pertumbuhan.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6 pt-6">
+                    {/* Interest Rate Slider */}
+                    <div className="p-4 border-2 border-[#1c1b1b] bg-[#fcf9f8] shadow-[3px_3px_0px_0px_#1c1b1b] space-y-3">
+                      <div className="flex justify-between items-center">
+                        <label className="font-label font-bold text-sm uppercase text-[#1c1b1b] flex items-center gap-2">
+                          <Landmark className="w-4 h-4 text-[#094cb2]" />
+                          Suku Bunga Bank Sentral: <span className="text-[#094cb2] font-heading font-extrabold text-lg">{interestRate}%</span>
+                        </label>
+                        <span className="font-label text-xs text-[#737784]">Skala: 1.0% - 20.0%</span>
+                      </div>
+                      <Slider
+                        value={[interestRate]}
+                        min={1.0}
+                        max={20.0}
+                        step={0.5}
+                        onValueChange={(val) => setInterestRate(val[0])}
+                      />
+                      <p className="font-serif text-xs text-[#434653] italic">
+                        Menaikkan suku bunga mempermahal pinjaman & menekan arus uang (mengerem inflasi).
+                      </p>
+                    </div>
+
+                    {/* Tax Rate Slider */}
+                    <div className="p-4 border-2 border-[#1c1b1b] bg-[#fcf9f8] shadow-[3px_3px_0px_0px_#1c1b1b] space-y-3">
+                      <div className="flex justify-between items-center">
+                        <label className="font-label font-bold text-sm uppercase text-[#1c1b1b] flex items-center gap-2">
+                          <Percent className="w-4 h-4 text-[#fe6b00]" />
+                          Tarif Pajak Efektif: <span className="text-[#fe6b00] font-heading font-extrabold text-lg">{taxRate}%</span>
+                        </label>
+                        <span className="font-label text-xs text-[#737784]">Skala: 5.0% - 35.0%</span>
+                      </div>
+                      <Slider
+                        value={[taxRate]}
+                        min={5.0}
+                        max={35.0}
+                        step={0.5}
+                        onValueChange={(val) => setTaxRate(val[0])}
+                      />
+                      <p className="font-serif text-xs text-[#434653] italic">
+                        Pajak tinggi mengurangi anggaran belanja publik namun memperkuat saldo kas pemerintah.
+                      </p>
+                    </div>
+
+                    {/* Simulation Execution */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                      <Button
+                        onClick={handleApplyPolicy}
+                        disabled={isSimulating}
+                        variant="action"
+                        size="lg"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2"
+                      >
+                        {isSimulating ? (
+                          <>
+                            <RotateCcw className="w-5 h-5 animate-spin" />
+                            Mengkalkulasi Simulasi...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-5 h-5 fill-current" />
+                            Terapkan Kebijakan Baru
+                          </>
+                        )}
+                      </Button>
+
+                      {lastAction && (
+                        <div className="flex items-center gap-2 font-label text-xs text-[#094cb2] font-bold bg-[#e7ebff] p-2 border border-[#1c1b1b]">
+                          <CheckCircle2 className="w-4 h-4 text-[#094cb2]" />
+                          {lastAction}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
-              <div
-                className={`max-w-[88%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-md ${
-                  msg.sender === "user"
-                    ? "bg-blue-600 text-white rounded-tr-none"
-                    : "bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-tl-none"
-                }`}
-              >
-                {msg.text}
+              {/* AI Mentor Comic Chat Panel (5 Cols) */}
+              <div className="lg:col-span-5 space-y-6">
+                <Card className="border-3 border-[#1c1b1b] shadow-[6px_6px_0px_0px_#1c1b1b] bg-white flex flex-col h-[520px]">
+                  <CardHeader className="bg-[#fe6b00] text-white border-b-3 border-[#1c1b1b]">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Bot className="w-5 h-5" />
+                        AI Mentor Ekonomi
+                      </CardTitle>
+                      <span className="bg-[#fae500] text-[#1c1b1b] font-label text-xs font-bold px-2 py-0.5 border border-[#1c1b1b]">
+                        Live Assistance
+                      </span>
+                    </div>
+                    <CardDescription className="text-white/90">
+                      Tanyakan konsep makro, dampak inflasi, atau saran keputusan menteri!
+                    </CardDescription>
+                  </CardHeader>
+
+                  {/* Chat Messages */}
+                  <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#fcf9f8]">
+                    {messages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex gap-3 ${
+                          msg.sender === "user" ? "flex-row-reverse" : "flex-row"
+                        }`}
+                      >
+                        <div
+                          className={`w-8 h-8 flex items-center justify-center border-2 border-[#1c1b1b] shrink-0 font-label font-bold text-xs ${
+                            msg.sender === "user"
+                              ? "bg-[#fae500] text-[#1c1b1b]"
+                              : "bg-[#094cb2] text-white"
+                          }`}
+                        >
+                          {msg.sender === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                        </div>
+
+                        <div
+                          className={`max-w-[80%] p-3 border-2 border-[#1c1b1b] shadow-[3px_3px_0px_0px_#1c1b1b] text-sm ${
+                            msg.sender === "user"
+                              ? "bg-[#fae500] text-[#1c1b1b] font-label font-medium"
+                              : "bg-white text-[#1c1b1b] speech-bubble font-serif"
+                          }`}
+                        >
+                          <p>{msg.text}</p>
+                          <span className="block font-label text-[10px] text-[#737784] mt-1 text-right">
+                            {msg.timestamp}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    <div ref={chatBottomRef} />
+                  </CardContent>
+
+                  {/* Chat Input */}
+                  <div className="p-3 border-t-3 border-[#1c1b1b] bg-white">
+                    <form onSubmit={handleSendMessage} className="flex gap-2">
+                      <Input
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        placeholder="Ketik pertanyaan untuk AI Mentor..."
+                        className="flex-1"
+                      />
+                      <Button type="submit" variant="default" size="icon" className="shrink-0">
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </form>
+                  </div>
+                </Card>
               </div>
             </div>
-          ))}
-          <div ref={chatBottomRef} />
-        </div>
+          </div>
+        )}
 
-        {/* AREA INPUT CHAT (BOTTOM AREA) */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/80 backdrop-blur-md">
-          <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-            <Input
-              type="text"
-              placeholder="Tanyakan saran kebijakan pada Budi..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              className="flex-1 bg-slate-900 border-slate-700 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus-visible:ring-blue-500 focus-visible:ring-1"
-            />
-            <Button
-              type="submit"
-              size="icon"
-              disabled={!inputMessage.trim()}
-              className="bg-blue-600 hover:bg-blue-500 text-white shrink-0 shadow-md shadow-blue-500/20"
-            >
-              <Send className="w-4 h-4" />
-              <span className="sr-only">Kirim</span>
-            </Button>
-          </form>
-          <p className="text-[10px] text-slate-500 text-center mt-2">
-            AI Advisor memberikan analisis berbasis model simulasi makroekonomi.
-          </p>
+        {/* TAB 2: DAFTAR MATERI */}
+        {activeTab === "materi" && (
+          <div className="space-y-6">
+            <div className="p-6 border-3 border-[#1c1b1b] bg-[#094cb2] text-white shadow-[6px_6px_0px_0px_#1c1b1b]">
+              <h2 className="font-heading text-3xl font-black uppercase tracking-tight">
+                Daftar Materi Webcomic Easynomics
+              </h2>
+              <p className="font-label text-sm text-[#d9e2ff] mt-1">
+                Kurikulum interaktif visual yang membedah teori ekonomi makro menjadi kisah visual intuitif.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#fe6b00] text-white border-b-2 border-[#1c1b1b]">
+                  <Badge variant="accent" className="w-fit mb-2">Bab 1.1</Badge>
+                  <CardTitle className="text-white">Misteri Uang Beredar & Inflasi</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-4">
+                  <p className="font-serif text-sm text-[#434653]">
+                    Pelajari mengapa mencetak uang secara sembarangan memicu kenaikan harga pasar global melalui cerita naratif interaktif.
+                  </p>
+                  <Button
+                    onClick={() => setActiveTab("webcomic")}
+                    variant="action"
+                    className="w-full flex items-center justify-between"
+                  >
+                    Buka Komik Interaktif
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#094cb2] text-white border-b-2 border-[#1c1b1b]">
+                  <Badge variant="accent" className="w-fit mb-2">Bab 1.2</Badge>
+                  <CardTitle className="text-white">Dilema Suku Bunga Moneter</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-4">
+                  <p className="font-serif text-sm text-[#434653]">
+                    Bagaimana keputusan Bank Sentral mengubah pasar properti, kredit usaha, dan investasi masyarakat.
+                  </p>
+                  <Button
+                    onClick={() => setActiveTab("dashboard")}
+                    variant="default"
+                    className="w-full flex items-center justify-between"
+                  >
+                    Uji di Simulator
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-3 border-[#1c1b1b] shadow-[4px_4px_0px_0px_#1c1b1b] bg-white">
+                <CardHeader className="bg-[#695f00] text-white border-b-2 border-[#1c1b1b]">
+                  <Badge variant="accent" className="w-fit mb-2">Bab 2.1</Badge>
+                  <CardTitle className="text-white">Fiskal & Anggaran Negara</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-4">
+                  <p className="font-serif text-sm text-[#434653]">
+                    Mengurai APBN, kebijakan subsidi, dan bagaimana pajak mendanai infrastruktur nasional.
+                  </p>
+                  <Button variant="outline" className="w-full flex items-center justify-between">
+                    Segera Hadir
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: WEBCOMIC INTERAKTIF 1.1 */}
+        {activeTab === "webcomic" && (
+          <div className="space-y-6">
+            <Card className="border-3 border-[#1c1b1b] shadow-[6px_6px_0px_0px_#1c1b1b] bg-white">
+              <CardHeader className="bg-[#fae500] text-[#1c1b1b] border-b-3 border-[#1c1b1b]">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Badge variant="default" className="mb-2">Konten Interaktif 1.1</Badge>
+                    <CardTitle className="text-[#1c1b1b] text-2xl">
+                      Misteri Inflasi: Ketika Harga Nasi Goreng Melonjak
+                    </CardTitle>
+                  </div>
+                  <Button
+                    onClick={() => setActiveTab("dashboard")}
+                    variant="action"
+                    className="hidden sm:flex items-center gap-1"
+                  >
+                    Coba Simulator
+                  </Button>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-6 space-y-6">
+                {/* Comic Panels Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Panel 1 */}
+                  <div className="border-3 border-[#1c1b1b] p-4 bg-[#fcf9f8] shadow-[4px_4px_0px_0px_#1c1b1b] space-y-3">
+                    <div className="bg-[#fe6b00] text-white font-label font-bold px-2 py-1 text-xs border border-[#1c1b1b] w-fit">
+                      PANEL 1: WARUNG PAK BUDI
+                    </div>
+                    <p className="font-serif text-base text-[#1c1b1b]">
+                      "Kemarin sepiring Nasi Goreng Spesial harganya Rp 15.000. Hari ini kenapa jadi Rp 25.000, Pak Budi?!"
+                    </p>
+                    <div className="p-3 bg-white border-2 border-[#1c1b1b] speech-bubble font-serif text-sm">
+                      <span className="font-bold text-[#094cb2]">Pak Budi:</span> "Harga beras naik, minyak goreng naik, telur juga mahal! Saya terpaksa menaikkan harga agar tidak bangkrut!"
+                    </div>
+                  </div>
+
+                  {/* Panel 2 */}
+                  <div className="border-3 border-[#1c1b1b] p-4 bg-[#fcf9f8] shadow-[4px_4px_0px_0px_#1c1b1b] space-y-3">
+                    <div className="bg-[#094cb2] text-white font-label font-bold px-2 py-1 text-xs border border-[#1c1b1b] w-fit">
+                      PANEL 2: PENJELASAN AI MENTOR
+                    </div>
+                    <p className="font-serif text-base text-[#1c1b1b]">
+                      Itulah fenomena <strong className="text-[#094cb2]">INFLASI</strong>! Kenaikan harga barang dan jasa secara umum dan terus menerus dalam jangka waktu tertentu.
+                    </p>
+                    <div className="p-3 bg-[#fae500] border-2 border-[#1c1b1b] font-label text-xs font-bold text-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]">
+                      💡 FAKTA KUNCI: Inflasi mengurangi daya beli uang Anda!
+                    </div>
+                  </div>
+                </div>
+
+                {/* Call to action inside comic */}
+                <div className="p-6 border-3 border-[#1c1b1b] bg-[#e7ebff] shadow-[4px_4px_0px_0px_#1c1b1b] flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-heading text-lg font-extrabold uppercase text-[#094cb2]">
+                      Siap Mengendalikan Inflasi Ini?
+                    </h4>
+                    <p className="font-serif text-sm text-[#434653]">
+                      Masuk ke Ruang Kebijakan Menteri dan sesuaikan suku bunga untuk meredam inflasi Pak Budi!
+                    </p>
+                  </div>
+                  <Button onClick={() => setActiveTab("dashboard")} variant="action" size="lg">
+                    Buka Simulator Menteri
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t-4 border-[#1c1b1b] bg-[#1c1b1b] text-white py-6 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-label text-xs text-[#c3c6d5]">
+          <div className="flex items-center gap-2">
+            <span className="bg-[#fae500] text-[#1c1b1b] px-2 py-0.5 font-bold border border-white">
+              EASYNOMICS
+            </span>
+            <span>Interactive Webcomic Platform &copy; 2026</span>
+          </div>
+          <div>Stitch Design System: Modern Brutalism Webcomic Edition</div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

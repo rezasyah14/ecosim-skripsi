@@ -23,10 +23,10 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     };
 
     return (
-      <div className={cn("relative flex w-full touch-none select-none items-center py-1", className)}>
-        <div className="relative h-2 w-full grow overflow-hidden rounded-full bg-slate-800">
+      <div className={cn("relative flex w-full touch-none select-none items-center py-2", className)}>
+        <div className="relative h-3 w-full grow overflow-hidden border-2 border-[#1c1b1b] bg-white">
           <div
-            className="absolute h-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-all duration-75"
+            className="absolute h-full bg-[#094cb2] transition-all duration-75"
             style={{ width: `${percentage}%` }}
           />
         </div>
@@ -42,8 +42,8 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
           {...props}
         />
         <div
-          className="pointer-events-none absolute h-5 w-5 rounded-full border-2 border-blue-500 bg-slate-900 shadow-md shadow-blue-500/30 transition-all"
-          style={{ left: `calc(${percentage}% - 10px)` }}
+          className="pointer-events-none absolute h-6 w-6 border-2 border-[#1c1b1b] bg-[#fae500] shadow-[2px_2px_0px_0px_#1c1b1b] transition-all"
+          style={{ left: `calc(${percentage}% - 12px)` }}
         />
       </div>
     );

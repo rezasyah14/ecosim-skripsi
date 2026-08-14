@@ -2,23 +2,24 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning";
+  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "accent";
 }
 
 function Badge({ className, variant = "default", ...props }: BadgeProps) {
   const variantStyles = {
-    default: "bg-blue-600/20 text-blue-400 border-blue-500/30",
-    secondary: "bg-slate-800 text-slate-300 border-slate-700",
-    destructive: "bg-red-500/20 text-red-400 border-red-500/30",
-    success: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    warning: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    outline: "text-slate-300 border-slate-700",
+    default: "bg-[#094cb2] text-white border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
+    secondary: "bg-[#fe6b00] text-white border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
+    accent: "bg-[#fae500] text-[#1c1b1b] border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
+    destructive: "bg-[#ba1a1a] text-white border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
+    success: "bg-emerald-400 text-[#1c1b1b] border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
+    warning: "bg-amber-300 text-[#1c1b1b] border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
+    outline: "bg-white text-[#1c1b1b] border-2 border-[#1c1b1b] shadow-[2px_2px_0px_0px_#1c1b1b]",
   };
 
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "inline-flex items-center px-2.5 py-0.5 text-xs font-label font-bold uppercase tracking-wider transition-colors rounded-none",
         variantStyles[variant],
         className
       )}

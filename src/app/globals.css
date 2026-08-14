@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #fcf9f8;
+    --foreground: #1c1b1b;
+    --primary: #094cb2;
+    --primary-container: #3366cc;
+    --secondary: #a04100;
+    --secondary-container: #fe6b00;
+    --tertiary: #695f00;
+    --tertiary-fixed: #fae500;
+    --outline: #737784;
+    --surface-container: #f0eded;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-noto-serif), Georgia, serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-bricolage), sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-heading {
+    font-family: var(--font-bricolage), sans-serif;
+  }
+
+  .font-label {
+    font-family: var(--font-space-grotesk), monospace, sans-serif;
+  }
+
+  .font-serif {
+    font-family: var(--font-noto-serif), Georgia, serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Modern Brutalism & Webcomic Utility Classes */
+.comic-panel {
+  background-color: #ffffff;
+  border: 3px solid #1c1b1b;
+  box-shadow: 4px 4px 0px 0px #1c1b1b;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.comic-panel-lg {
+  background-color: #ffffff;
+  border: 3px solid #1c1b1b;
+  box-shadow: 6px 6px 0px 0px #1c1b1b;
+}
+
+.comic-button {
+  border: 2px solid #1c1b1b;
+  box-shadow: 3px 3px 0px 0px #1c1b1b;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 700;
+  transition: all 0.1s ease;
+}
+
+.comic-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px 0px #1c1b1b;
+}
+
+.comic-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #1c1b1b;
+}
+
+.comic-badge {
+  border: 2px solid #1c1b1b;
+  box-shadow: 2px 2px 0px 0px #1c1b1b;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 700;
+}
+
+.speech-bubble {
+  position: relative;
+  border: 3px solid #1c1b1b;
+  background: #ffffff;
+  box-shadow: 4px 4px 0px 0px #1c1b1b;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: 24px;
+  border-width: 14px 12px 0;
+  border-style: solid;
+  border-color: #1c1b1b transparent;
+  display: block;
+  width: 0;
+}
+
+.halftone-bg {
+  background-image: radial-gradient(#1c1b1b 15%, transparent 16%);
+  background-size: 12px 12px;
+  opacity: 0.08;
 }
